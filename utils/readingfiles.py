@@ -36,14 +36,20 @@ def get_streaming_history(zipped_data: ZipFile) -> pd.DataFrame:
         os.makedirs(output_dir_name)  # create temp folder for imported files
     except FileExistsError:
         for file_to_remove in os.listdir(output_dir_name):  # if it already exists, clear it
-            os.remove(os.path.join(output_dir_name, file_to_remove))
+            shutil.rmtree(os.path.join(output_dir_name, file_to_remove))
     zipped_data.extractall(output_dir_name)  # extract imported files
     result = pd.DataFrame()
     streaming_hist_regex = re.compile("StreamingHistory\\d+.json")
     # searching for "StreamingHistoryX.json" files
-    for filename in filter(streaming_hist_regex.match, os.listdir(output_dir_name)):
+    curr_path = os.path.abspath(output_dir_name)
+    dir_contents = os.listdir(curr_path)
+    if len(dir_contents) == 1 and os.path.isdir(
+            os.path.join(output_dir_name, dir_contents[0])):  # True if zip has a folder in it
+        curr_path = os.path.join(curr_path, dir_contents[0])
+        dir_contents = os.listdir(curr_path)
+    for filename in filter(streaming_hist_regex.match, dir_contents):
         result = pd.concat([result,
-                            pd.read_json(os.path.join(output_dir_name, filename))],
+                            pd.read_json(os.path.join(curr_path, filename))],
                            axis=0)
     shutil.rmtree(output_dir_name)
     return result
