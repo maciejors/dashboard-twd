@@ -11,8 +11,8 @@ def get_sp_auth():  # obiekt sp z autoryzacją
 
 
 def get_sp():  # obierkt sp bez autoryzacji
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="YOUR_APP_CLIENT_ID",
-                                                               client_secret="YOUR_APP_CLIENT_SECRET"))
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="a8b8c48cee0545c488338c72fff5779c",
+                                                               client_secret="d94ae17308ef4048aa131847ce052309"))
     return sp
 
 
