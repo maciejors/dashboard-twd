@@ -8,11 +8,12 @@ from Spotipy import get_sp
 def favourite_artist(df: pd.DataFrame, size: int = 2) -> Tuple[str, str]:
     """
     Returns a name and an URL to an image of the most listened to artist
+
     :param size: An integer of value 0, 1 or 2 (default). It determines
-    the size of an image (0 - smallest, 2 - biggest).
+        the size of an image (0 - smallest, 2 - biggest).
     :param df: DataFrame with spotify streaming history
     :return: tuple containing artist's name and image URL separated by
-    "|" character
+        "|" character
     """
     size = 2 - size  # correction -
     # without it, 0 would mean the biggest image, which is counter-intuitive

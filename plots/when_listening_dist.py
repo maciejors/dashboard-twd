@@ -8,6 +8,7 @@ def when_listening_dist(df: pd.DataFrame):
     """
     Returns a barplot showing distribution of when during a day music
     was played
+
     :param df: DataFrame with spotify streaming history
     :return: Plotly barplot
     """
