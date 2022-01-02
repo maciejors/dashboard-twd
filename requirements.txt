@@ -6,3 +6,4 @@ plotly>=5.4.0
 matplotlib>=3.3.2
 scikit-image>=0.19.1
 lyricsgenius>=3.0.1
+wordcloud>=1.8.1
