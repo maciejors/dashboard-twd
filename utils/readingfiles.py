@@ -48,8 +48,8 @@ def get_streaming_history(zipped_data: ZipFile) -> pd.DataFrame:
         curr_path = os.path.join(curr_path, dir_contents[0])
         dir_contents = os.listdir(curr_path)
     for filename in filter(streaming_hist_regex.match, dir_contents):
-        result = pd.concat([result,
-                            pd.read_json(os.path.join(curr_path, filename))],
-                           axis=0)
+        file_df = pd.read_json(os.path.join(curr_path, filename))
+        result = pd.concat([result, file_df],
+                           axis=0, ignore_index=True)
     shutil.rmtree(output_dir_name)
-    return result
+    return result.sort_values("endTime", ignore_index=True)
