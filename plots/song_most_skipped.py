@@ -1,7 +1,9 @@
+from zipfile import ZipFile
+
 import pandas as pd, matplotlib.pyplot as plt, spotipy
 from skimage import io
 from Spotipy import get_sp
-
+import utils.readingfiles
 
 def most_skipped(df):
     """returns a pyplot figure displaying what song has been skipped the most
@@ -13,8 +15,8 @@ def most_skipped(df):
     track_name = results.index[0][0]
     artist_name = results.index[0][1]
     artist_id = ''
-    cover = ''
-    tracks = sp.search(q=track_name, type='track', limit=20)
+    cover = "https://i.scdn.co/image/ab67616d0000b2735ade9b4d547203c9061fc340"  # tymczasowy obrazek, jeśli nie znajdziemy tego właściwego
+    tracks = sp.search(q=track_name, type='track', limit=50)
     for track in tracks['tracks']['items']:
         artist = track['artists']
         if artist_name == artist[0]['name']:
@@ -26,6 +28,7 @@ def most_skipped(df):
     # x.a
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
+    print(cover)
     image = io.imread(cover)
     ax = plt.imshow(image)
     plt.axis('off')
