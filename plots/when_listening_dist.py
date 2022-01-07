@@ -13,8 +13,11 @@ def when_listening_dist(df: pd.DataFrame):
     :return: Plotly barplot
     """
     df = df.copy()
+    # df["hour"] = df["endTime"].apply(
+    #     lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M").hour)
+    df["endTime"] = pd.to_datetime(df["endTime"], format="%Y-%m-%d %H:%M")
     df["hour"] = df["endTime"].apply(
-        lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M").hour)
+        lambda date: date.hour)
     df = df[["hour", "artistName"]] \
         .groupby("hour") \
         .agg("count") \

@@ -1,3 +1,4 @@
+from datetime import datetime
 import io
 import base64
 
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt
 import wordcloud
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 from utils.decorators import all_args_none
 from utils.readingfiles import parse_zip, get_streaming_history
@@ -18,7 +19,10 @@ from plots.song_most_skipped import most_skipped
 from plots.when_listening_dist import when_listening_dist
 from plots.wordcloud_maker import create_wordcloud
 
-app = dash.Dash(__name__)
+app = dash.Dash(
+    __name__,
+    suppress_callback_exceptions=True,
+)
 server = app.server
 
 app.layout = html.Div([
@@ -48,6 +52,9 @@ def update_streaming_history(file_contents):
     return streaming_history.to_dict()
 
 
+# ========== FAVOURITE ARTIST ========== #
+
+
 @app.callback(
     Output("favourite-artist", "children"),
     Input("streaming-history-storage", "data"))
@@ -64,6 +71,9 @@ def update_favourite_artist(streaming_history):
     ]
 
 
+# ========== MOST SKIPPED TRACK ========== #
+
+
 @app.callback(
     Output("most-skipped", "children"),
     Input("streaming-history-storage", "data"))
@@ -76,10 +86,15 @@ def update_most_skipped(streaming_history):
     plt.savefig(img, format="png")
     plt.close()
     data = base64.b64encode(img.getvalue()).decode("utf8")
-    return html.Img(
-        src=f"data:image/png;base64,{data}",
-        alt="most skipped track"
-    )
+    return [
+        html.Img(
+            src=f"data:image/png;base64,{data}",
+            alt="most skipped track"
+        )
+    ]
+
+
+# ========== WHEN LISTENING DISTRIBUTION ========== #
 
 
 @app.callback(
@@ -87,8 +102,43 @@ def update_most_skipped(streaming_history):
     Input("streaming-history-storage", "data"))
 @all_args_none(default_val=None)
 def update_when_listening(streaming_history):
-    streaming_history = pd.DataFrame(streaming_history)
-    return dcc.Graph(figure=when_listening_dist(streaming_history))
+    df = pd.DataFrame(streaming_history)
+    dates = pd.to_datetime(df["endTime"], format="%Y-%m-%d %H:%M")
+    min_date = dates.min()
+    max_date = dates.max()
+    return [
+        dcc.Store(
+            id="streaming-history-dates-filtered",
+            data=streaming_history,
+        ),
+        dcc.DatePickerRange(
+            id="when-listening-date-range",
+            min_date_allowed=min_date,
+            max_date_allowed=max_date,
+            initial_visible_month=max_date,
+            start_date=min_date,
+            end_date=max_date,
+        ),
+        dcc.Graph(
+            id="when-listening-plot",
+            figure=when_listening_dist(df),
+        ),
+    ]
+
+
+@app.callback(
+    Output("when-listening-plot", "figure"),
+    Input("when-listening-date-range", "start_date"),
+    Input("when-listening-date-range", "end_date"),
+    State("streaming-history-storage", "data"))
+def on_date_range_changed(start_date, end_date, streaming_history):
+    df = pd.DataFrame(streaming_history)
+    df["endTime"] = pd.to_datetime(df["endTime"], format="%Y-%m-%d %H:%M")
+    df = df[(df["endTime"] > start_date) & (df["endTime"] < end_date)]
+    return when_listening_dist(df)
+
+
+# ========== WORD CLOUD ========== #
 
 
 @app.callback(
@@ -106,11 +156,13 @@ def update_wordcloud(streaming_history):
     img = io.BytesIO()
     wcloud.to_image().save(img, format="png")
     data = base64.b64encode(img.getvalue()).decode("utf8")
-    return html.Img(
-        src=f"data:image/png;base64,{data}",
-        alt="Wordcloud of words in lyrics"
-    )
+    return [
+        html.Img(
+            src=f"data:image/png;base64,{data}",
+            alt="Wordcloud of words in lyrics"
+        )
+    ]
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
