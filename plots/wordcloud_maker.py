@@ -44,9 +44,9 @@ def create_wordcloud(words_to_cloud):
     podana przez get_lyrics(get_streaming_history(zipped_data)))
     """
 
-    with open("./assets/sw.txt", "r", encoding = "utf-8") as file:
+    with open("./assets/sw.txt", "r", encoding="utf-8") as file:
         sw = eval(file.read())
-        return WordCloud(stopwords=sw, background_color="white").generate(words_to_cloud)
+        return WordCloud(stopwords=sw, background_color="#2B2B2B", width=800, height=400).generate(words_to_cloud)
 
 # Tak to testowałem, wrzucam żeby na potem było wiadomo co tam dodatkowo trzeba dopisać przy
 # printowaniu żeby ładnie wyglądało

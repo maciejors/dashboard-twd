@@ -1,48 +1,72 @@
-from datetime import datetime
-import io
 import base64
+import io
 
 import dash
 import pandas as pd
-import matplotlib.pyplot as plt
 import wordcloud
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-from utils.decorators import all_args_none
-from utils.readingfiles import parse_zip, get_streaming_history
-from utils.lyrics_getter import get_lyrics
-
 from plots.favourite_artist import favourite_artist
 from plots.song_most_skipped import most_skipped
 from plots.when_listening_dist import when_listening_dist
 from plots.wordcloud_maker import create_wordcloud
-
+from utils.decorators import all_args_none
+from utils.lyrics_getter import get_lyrics
+from utils.readingfiles import parse_zip, get_streaming_history
 
 app = dash.Dash(
     __name__,
-    suppress_callback_exceptions=True,
+    suppress_callback_exceptions=True
 )
 server = app.server
 
 app.layout = html.Div([
+    html.H2("Upload your Spotify data, then choose date range to analyse or leave the default date.",
+            style={
+                'textAlign': 'center'
+            }),
     dcc.Upload(
         id="upload-data",
         children=html.Button("Upload zipped Spotify data"),
         accept=".zip",
         multiple=False,
+        style={
+            'textAlign': 'center'
+        }
     ),
-    html.Div(id="all-data"),
-    html.Div(id="date-picker-div"),
-    html.Div(id="favourite-artist"),
+    html.Div(id="all-data",
+             style={
+                 'textAlign': 'center'
+             }),
+    html.Div(id="date-picker-div",
+             style={
+                 'textAlign': 'center'
+             }),
+    html.Div(id="favourite-artist",
+             style={
+                 'textAlign': 'center'
+             }),
     html.Hr(),
-    html.Div(id="most-skipped"),
+    html.Div(id="most-skipped",
+             style={
+                 'textAlign': 'center'
+             }),
     html.Hr(),
-    html.Div(id="when-listening"),
+    html.Div(id="when-listening",
+             style={
+                 'textAlign': 'center'
+             }),
     html.Hr(),
-    html.Div(id="slider-div"),
-    html.Div(id="wordcloud"),
+    html.Div(id="slider-div",
+             style={
+                 'textAlign': 'center'
+             }),
+    html.Div(id="wordcloud",
+             style={
+                 'textAlign': 'center'
+             }),
 ])
 
 
@@ -91,6 +115,10 @@ def update_date_picker(streaming_history):
 @all_args_none(default_val=None)
 def update_slider(streaming_history):
     return [
+        html.H3("Pick a number of songs to create the word cloud from:",
+                style={
+                    'textAlign': 'center'
+                }),
         dcc.Slider(
             id="last-x-songs-slider",
             min=5,
@@ -137,7 +165,7 @@ def update_favourite_artist(streaming_history):
     streaming_history = pd.DataFrame(streaming_history)
     artist_name, img_url = favourite_artist(streaming_history)
     return [
-        html.H4(f"Most listened to artist: {artist_name}"),
+        html.H3(f"Most listened to artist: {artist_name}"),
         html.Img(
             alt=f"Image of {artist_name}",
             src=img_url
@@ -157,13 +185,13 @@ def update_most_skipped(streaming_history):
     cover_img_url, number_of_skips, track_name, artist_name = \
         most_skipped(streaming_history)
     return [
-        html.H4(f'najczęściej przewijana piosenka w ciągu pierwszych dwóch sekund.'
-                f'\nPrzewinięta została {number_of_skips} razy.'),
+        html.H3(f'The song you\'ve skipped the most during its first two seconds.'
+                f'\nYou\'ve skipped it {number_of_skips} times.'),
         html.Img(
             src=cover_img_url,
             alt="most skipped track"
         ),
-        html.H4(f'{track_name} wykonawcy {artist_name}')
+        html.H4(f'\"{track_name}\" by {artist_name}')
     ]
 
 
@@ -177,6 +205,7 @@ def update_most_skipped(streaming_history):
 def update_when_listening(streaming_history):
     df = pd.DataFrame(streaming_history)
     return [
+        html.H3('When do you listen to Spotify?'),
         dcc.Graph(
             id="when-listening-plot",
             figure=when_listening_dist(df),
@@ -189,9 +218,10 @@ def update_when_listening(streaming_history):
 
 @app.callback(
     Output("wordcloud", "children"),
-    Input("streaming-history-last-x-songs", "data"))
+    [Input("streaming-history-last-x-songs", "data"),
+     Input("last-x-songs-slider", "value")])
 @all_args_none(default_val=None)
-def update_wordcloud(streaming_history):
+def update_wordcloud(streaming_history, slider_value):
     streaming_history = pd.DataFrame(streaming_history)
     wcloud: wordcloud.WordCloud = create_wordcloud(
         get_lyrics(streaming_history)
@@ -200,6 +230,7 @@ def update_wordcloud(streaming_history):
     wcloud.to_image().save(img, format="png")
     data = base64.b64encode(img.getvalue()).decode("utf8")
     return [
+        html.H4(f'The most common words in last {slider_value} songs you\'ve listened to:'),
         html.Img(
             src=f"data:image/png;base64,{data}",
             alt="Wordcloud of words in lyrics"
