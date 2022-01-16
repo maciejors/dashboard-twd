@@ -8,7 +8,9 @@ import utils.readingfiles
 def most_skipped(df):
     """returns a pyplot figure displaying what song has been skipped the most
 
-    :param df: DataFrame with spotify streaming history"""
+    :param df: DataFrame with spotify streaming history
+    :return a tuple: (cover_img_link, number_of_skips, track_name, artist_name)
+    """
     sp = get_sp()
     results = df.loc[(df.msPlayed <= 2000)].groupby(["trackName", "artistName"]).trackName.agg('count').sort_values(
         axis=0, ascending=False)
@@ -26,15 +28,16 @@ def most_skipped(df):
     # fig = plt.figure()
     # ax = fig.add_subplot(1,1,1)
     # x.a
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    print(cover)
-    image = io.imread(cover)
-    ax = plt.imshow(image)
-    plt.axis('off')
-    text = 'najczęściej przewijana piosenka w ciągu pierwszych dwóch sekund.\nPrzewinięta została ' + str(
-        results[0]) + ' razy.'
-    fig.suptitle(text)
-    size = fig.get_size_inches() * fig.dpi
-    plt.text(0, size[0] + 60, track_name + ' wykonawcy ' + artist_name, size=12)
-    return(fig)
+
+    # fig = plt.figure()
+    # ax = fig.add_subplot(1, 1, 1)
+    # print(cover)
+    # image = io.imread(cover)
+    # ax = plt.imshow(image)
+    # plt.axis('off')
+    # text = 'najczęściej przewijana piosenka w ciągu pierwszych dwóch sekund.\nPrzewinięta została ' + str(
+    #     results[0]) + ' razy.'
+    # fig.suptitle(text)
+    # size = fig.get_size_inches() * fig.dpi
+    # plt.text(0, size[0] + 60, track_name + ' wykonawcy ' + artist_name, size=12)
+    return cover, results[0], track_name, artist_name
