@@ -1,7 +1,9 @@
+import pandas as pd
+
 from Spotipy import get_sp
 
 
-def most_skipped(df):
+def most_skipped(df: pd.DataFrame):
     """returns data about a song that has been skipped the most
 
     :param df: DataFrame with spotify streaming history
