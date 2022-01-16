@@ -157,6 +157,12 @@ def update_wordcloud(streaming_history):
     wcloud.to_image().save(img, format="png")
     data = base64.b64encode(img.getvalue()).decode("utf8")
     return [
+        dcc.Slider(
+            min=5,
+            max=20,
+            marks={i: '{}'.format(i) for i in range(3, 21)},
+            value=10,
+        ),
         html.Img(
             src=f"data:image/png;base64,{data}",
             alt="Wordcloud of words in lyrics"
