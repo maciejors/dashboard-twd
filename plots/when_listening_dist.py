@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pandas as pd
 import plotly.express as px
 
@@ -32,12 +30,17 @@ def when_listening_dist(df: pd.DataFrame):
     df["hour"] = df["hour"].astype(str)
     df = df.assign(hourInterval=lambda x: x["hour"] + ":00 - " + x["hour"] + ":59")[
         ["hourInterval", "count"]]
-    return px.bar(
+    fig = px.bar(
         data_frame=df,
         x="hourInterval",
         y="count",
         labels={
             "hourInterval": "Hour interval",
-            "count": "Number of tracks listened to"
-        }
+            "count": "Number of tracks listened to",
+        },
+        color_discrete_sequence=['#CB772F'] * len(df)
     )
+    fig.update_layout(paper_bgcolor='rgba(43, 43, 43, 1)',
+                      plot_bgcolor='rgba(43, 43, 43, 1)',
+                      font=dict([('color', 'rgba(255, 198, 109, 1)')]))
+    return fig
