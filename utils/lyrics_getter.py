@@ -3,6 +3,9 @@ import re
 
 from lyricsgenius import Genius
 
+token = "iAWTneaCajreA1nrWBVBnaW_qYNu2g7i9FoOQ-33BffLnilwO_w4d8DuOPOl2jsb"
+genius = Genius(token)
+
 
 def get_lyrics(streaming_history_df):
     lyrics = ""
@@ -13,11 +16,9 @@ def get_lyrics(streaming_history_df):
 
 
 def scrape_lyrics(artistname, songname):
-    token = "iAWTneaCajreA1nrWBVBnaW_qYNu2g7i9FoOQ-33BffLnilwO_w4d8DuOPOl2jsb"
-    genius = Genius(token)
     try:
         song = genius.search_song(songname, artistname)
-    except TimeoutError:
+    except Exception:
         print("TIMEOUT ERROR OCCURED")
         return ''
     try:
