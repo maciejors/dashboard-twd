@@ -1,9 +1,5 @@
-from zipfile import ZipFile
-
-import pandas as pd, matplotlib.pyplot as plt, spotipy
-from skimage import io
 from Spotipy import get_sp
-import utils.readingfiles
+
 
 def most_skipped(df):
     """returns data about a song that has been skipped the most
