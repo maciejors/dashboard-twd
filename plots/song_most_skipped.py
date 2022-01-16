@@ -6,10 +6,10 @@ from Spotipy import get_sp
 import utils.readingfiles
 
 def most_skipped(df):
-    """returns a pyplot figure displaying what song has been skipped the most
+    """returns data about a song that has been skipped the most
 
     :param df: DataFrame with spotify streaming history
-    :return a tuple: (cover_img_link, number_of_skips, track_name, artist_name)
+    :return: a tuple: (cover_img_link, number_of_skips, track_name, artist_name)
     """
     sp = get_sp()
     results = df.loc[(df.msPlayed <= 2000)].groupby(["trackName", "artistName"]).trackName.agg('count').sort_values(
