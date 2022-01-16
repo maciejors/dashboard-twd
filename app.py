@@ -8,6 +8,7 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
+from plots.Mainstreamness import popularity
 from plots.favourite_artist import favourite_artist
 from plots.song_most_skipped import most_skipped
 from plots.when_listening_dist import when_listening_dist
@@ -44,6 +45,7 @@ app.layout = html.Div([
              style={
                  'textAlign': 'center'
              }),
+    html.Hr(),
     html.Div(id="favourite-artist",
              style={
                  'textAlign': 'center'
@@ -67,6 +69,11 @@ app.layout = html.Div([
              style={
                  'textAlign': 'center'
              }),
+    html.Hr(),
+    html.Div(id="popularity-dist",
+             style={
+                 'textAlign': 'center'
+             })
 ])
 
 
@@ -165,7 +172,7 @@ def update_favourite_artist(streaming_history):
     streaming_history = pd.DataFrame(streaming_history)
     artist_name, img_url = favourite_artist(streaming_history)
     return [
-        html.H3(f"Most listened to artist: {artist_name}"),
+        html.H3(f"The artist you\'ve listened to the most: {artist_name}"),
         html.Img(
             alt=f"Image of {artist_name}",
             src=img_url
@@ -210,6 +217,22 @@ def update_when_listening(streaming_history):
             id="when-listening-plot",
             figure=when_listening_dist(df),
         ),
+    ]
+
+# ========== POPULARITY DISTRIBUTION ==========#
+
+@app.callback(
+    Output("popularity-dist", "children"),
+    Input("streaming-history-dates-filtered", "data"))
+@all_args_none(default_val=None)
+def update_popularity_distribution(streaming_history):
+    df = pd.DataFrame(streaming_history)
+    return [
+        html.H3("How mainstream are you?"),
+        dcc.Graph(
+            id="popularity-distribution-plot",
+            figure=popularity(df)
+        )
     ]
 
 

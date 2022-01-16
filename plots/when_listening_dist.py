@@ -38,9 +38,14 @@ def when_listening_dist(df: pd.DataFrame):
             "hourInterval": "Hour interval",
             "count": "Number of tracks listened to",
         },
-        color_discrete_sequence=['#CB772F'] * len(df)
+        color_discrete_sequence=['#CB772F'] * len(df),
+        title="Number of songs you\'ve listened to in given time intervals"
     )
     fig.update_layout(paper_bgcolor='rgba(43, 43, 43, 1)',
                       plot_bgcolor='rgba(43, 43, 43, 1)',
-                      font=dict([('color', 'rgba(255, 198, 109, 1)')]))
+                      font=dict(
+                          family="Courier New, monospace",
+                          size=14,
+                          color="#CB772F")
+                      )
     return fig
