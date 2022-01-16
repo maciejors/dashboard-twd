@@ -1,0 +1,112 @@
+body {
+    background-color: #2B2B2B;
+    color: #A9B7C6;
+    font-family: "Fira Code", "Lucida Console", Monaco, monospace;
+    padding-bottom: 5%;
+}
+
+h1 {
+    font-size: 3em;
+}
+
+h2 {
+    font-size: 1.75em;
+    font-style: italic;
+    padding: 20px 0 20px 0;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+h4 {
+    font-size: 1.25em;
+}
+
+h5, h6, p, li {
+    font-size: 1em;
+}
+
+h1, .number {
+    color: #6897BB;
+}
+
+h2, .keyword {
+    color: #CB772F;
+}
+
+h3, h4, h5, h6, .htmlTag {
+    color: #FFC66D;
+}
+
+.comment, small {
+    color: #808080;
+}
+
+a {
+    font-size: .9em;
+    color: #A5C25C;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #619647;
+}
+
+button {
+    color: #2B2B2B;
+    background-color: #CB772F;
+    border: none;
+    padding: 20px 20px;
+    border-radius: 2px;
+}
+
+hr {
+    background-color: #CB772F;
+    height: 4px;
+    border: 2px solid #FFC66D;
+    border-radius: 2px;
+}
+
+/* Slider */
+
+.rc-slider-rail {
+    background-color: #CB772F;
+}
+
+.rc-slider-track {
+    background-color: #FFC66D;
+}
+
+.rc-slider-dot {
+    background-color: #CB772F;
+    border-color: #CB772F;
+}
+
+.rc-slider-dot-active {
+    border-color: #FFC66D;
+}
+
+.rc-slider-handle {
+    border-color: #FFC66D;
+    background-color: #CB772F;
+}
+
+/* DateRangePicker */
+/*
+.DateRangePickerInput {
+    background-color: #CB772F;
+    border-color: #CB772F;
+    border-radius: 2px;
+}
+
+.CalendarDay__selected,
+.CalendarDay__selected:active,
+.CalendarDay__selected:hover {
+  background: #FFC66D;
+}
+
+.CalendarDay__selected_span {
+  background: #CB772F;
+}
+*/

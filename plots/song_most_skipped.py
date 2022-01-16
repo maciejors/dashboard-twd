@@ -15,7 +15,7 @@ def most_skipped(df: pd.DataFrame):
     track_name = results.index[0][0]
     artist_name = results.index[0][1]
     artist_id = ''
-    cover = "https://i.scdn.co/image/ab67616d0000b2735ade9b4d547203c9061fc340"  # tymczasowy obrazek, jeśli nie znajdziemy tego właściwego
+    cover = ""
     tracks = sp.search(q=track_name, type='track', limit=50)
     for track in tracks['tracks']['items']:
         artist = track['artists']
