@@ -27,8 +27,8 @@ def when_listening_dist(df: pd.DataFrame):
             df = df.append({"hour": i, "count": 0}, ignore_index=True)
     df = df.sort_values("hour", ignore_index=True)
     # format the interval
-    df["hour"] = df["hour"].astype(str)
-    df = df.assign(hourInterval=lambda x: x["hour"] + ":00 - " + x["hour"] + ":59")[
+    df = df.assign(hourInterval=lambda x: x["hour"].astype(str) + " - " +
+                                          ((x["hour"] + 1) % 24).astype(str))[
         ["hourInterval", "count"]]
     fig = px.bar(
         data_frame=df,
