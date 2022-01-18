@@ -23,28 +23,34 @@ app = dash.Dash(
 )
 server = app.server
 
-separator = html.Hr()
 
-
-def wrap_with_custom_loading(children):
-    return html.Div([
-        html.Br(),
-        dcc.Loading(
-            children=children,
-            type="circle",
-            color="#FFC66D",
-        ),
-        html.Br(),
-    ])
+def wrap_with_custom_loading(children, style=None):
+    if style is None:
+        style = dict()
+    return html.Div(
+        children=[
+            html.Br(),
+            dcc.Loading(
+                children=children,
+                type="circle",
+                color="#FFC66D",
+            ),
+            html.Br(),
+        ],
+        style=style
+    )
 
 
 app.layout = html.Div([
+    # title:
     html.H2(
         "Upload your Spotify data, then choose date range to analyse or leave the default date.",
         style={
             'textAlign': 'center'
         }),
+    # data storage:
     html.Div(id="all-data"),
+    # upload button:
     dcc.Upload(
         id="upload-data",
         children=html.Button("Upload zipped Spotify data"),
@@ -54,34 +60,46 @@ app.layout = html.Div([
             'textAlign': 'center'
         }
     ),
+    # date picker:
+    html.Br(),
     html.Div(id="date-picker-div",
              style={
                  'textAlign': 'center'
              }),
+    # favourite artist:
+    html.Div(id="separator1"),
     wrap_with_custom_loading(
         html.Div(id="favourite-artist",
                  style={
                      'textAlign': 'center'
-                 })
+                 }),
     ),
+    # most skipped song:
+    html.Div(id="separator2"),
     wrap_with_custom_loading(
         html.Div(id="most-skipped",
                  style={
                      'textAlign': 'center'
-                 })
+                 }),
     ),
+    # when do you listen:
+    html.Div(id="separator3"),
     wrap_with_custom_loading(
         html.Div(id="when-listening",
                  style={
                      'textAlign': 'center'
                  })
     ),
+    # popularity distribution:
+    html.Div(id="separator4"),
     wrap_with_custom_loading(
         html.Div(id="popularity-dist",
                  style={
                      'textAlign': 'center'
                  })
     ),
+    # wordcloud:
+    html.Div(id="separator5"),
     html.Div(id="slider-div",
              style={
                  'textAlign': 'center',
@@ -114,6 +132,17 @@ def update_streaming_history(file_contents):
 
 
 @app.callback(
+    Output("separator1", "children"),
+    Output("separator2", "children"),
+    Output("separator3", "children"),
+    Output("separator4", "children"),
+    Output("separator5", "children"),
+    Input("streaming-history-storage", "data"))
+def place_separators(streaming_history):
+    return [html.Hr()] * 5
+
+
+@app.callback(
     Output("date-picker-div", "children"),
     Input("streaming-history-storage", "data"))
 @all_args_none(default_val=None)
@@ -123,7 +152,6 @@ def update_date_picker(streaming_history):
     min_date = dates.min()
     max_date = dates.max()
     return [
-        html.Br(),
         dcc.DatePickerRange(
             id="when-listening-date-range",
             min_date_allowed=min_date,
@@ -141,7 +169,6 @@ def update_date_picker(streaming_history):
 @all_args_none(default_val=None)
 def update_slider(streaming_history):
     return [
-        separator,
         html.H3("Pick a number of songs to create the word cloud from:",
                 style={
                     'textAlign': 'center'
@@ -200,8 +227,8 @@ def update_favourite_artist(streaming_history):
     import time
     time.sleep(2.0)
     return [
-        separator,
-        html.H3(f"The artist you\'ve listened to the most: {artist_name}"),
+        html.H3("The artist you\'ve listened to the most:"),
+        html.H3(artist_name),
         html.Img(
             alt=f"Image of {artist_name}",
             src=img_url
@@ -221,9 +248,9 @@ def update_most_skipped(streaming_history):
     cover_img_url, number_of_skips, track_name, artist_name = \
         most_skipped(streaming_history)
     return [
-        separator,
-        html.H3(f'The song you\'ve skipped the most during its first two seconds.'
-                f'\nYou\'ve skipped it {number_of_skips} times.'),
+        html.H3('The song you\'ve skipped the most'),
+        html.H3('during its first two seconds.'),
+        html.H3(f'You\'ve skipped it {number_of_skips} times.'),
         html.Img(
             src=cover_img_url,
             alt="most skipped track"
@@ -242,7 +269,6 @@ def update_most_skipped(streaming_history):
 def update_when_listening(streaming_history):
     df = pd.DataFrame(streaming_history)
     return [
-        separator,
         html.H3('When do you listen to Spotify?'),
         dcc.Graph(
             id="when-listening-plot",
@@ -261,7 +287,6 @@ def update_when_listening(streaming_history):
 def update_popularity_distribution(streaming_history):
     df = pd.DataFrame(streaming_history)
     return [
-        separator,
         html.H3("How mainstream are you?"),
         dcc.Graph(
             id="popularity-distribution-plot",
@@ -296,4 +321,4 @@ def update_wordcloud(streaming_history, slider_value):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
