@@ -159,6 +159,7 @@ def update_date_picker(streaming_history):
             initial_visible_month=max_date,
             start_date=min_date,
             end_date=max_date,
+            display_format="D MMM YYYY",
         ),
     ]
 
