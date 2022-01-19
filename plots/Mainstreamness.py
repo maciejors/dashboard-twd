@@ -1,3 +1,5 @@
+import random
+
 import let
 import pandas as pd
 import plotly.express as px
@@ -18,6 +20,7 @@ def popularity(df):
     for song in songs.iterrows():
         artists.append(song[1].artistName)
     artists = list(set(artists))
+    artists = random.sample(artists, round(len(artists)/10))
     popularity = []
     for artistName in artists:
         artist = sp.search(q=artistName, type="artist")
@@ -25,6 +28,8 @@ def popularity(df):
             popularity.append(None)
             continue
         popularity.append(artist["artists"]["items"][0]["popularity"])
+        if artist["artists"]["items"][0]["popularity"] == 1:
+            print(artist["artists"]["items"][0])
     data = {'artist': artists,
             'popularity': popularity}
     df = pd.DataFrame(data, columns=['artist', 'popularity'])
@@ -46,11 +51,5 @@ def popularity(df):
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
     })
     return fig
-
-if __name__ == "__main__":
-
-
-
-
 
 
