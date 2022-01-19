@@ -1,17 +1,16 @@
-import let
-import pandas as pd
-import plotly.express as px
-from zipfile import ZipFile
-import utils
-from Spotipy import get_sp
-from utils.readingfiles import get_streaming_history
 from random import sample
 
+import pandas as pd
+import plotly.express as px
+
+from Spotipy import get_sp
+
+
 def popularity(df):
-    '''
+    """
     :param df: Dataframe with spotify streaming history
     :return: plotly.express figure (histogram plot)
-    '''
+    """
     songs = df
     sp = get_sp()
     print(songs)

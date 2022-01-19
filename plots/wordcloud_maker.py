@@ -40,8 +40,10 @@ from wordcloud import WordCloud
 
 def create_wordcloud(words_to_cloud):
     """
-    Ta funkcja wypluwa chmurę słów, to 'words_to_cloud' to ramka danych najprawdopodobniej
-    podana przez get_lyrics(get_streaming_history(zipped_data)))
+    Returns a wordcloud made from songs passed in words_to_cloud data frame
+
+    :param words_to_cloud: DataFrame with spotify streaming history
+    :return: word cloud
     """
 
     with open("./assets/sw.txt", "r", encoding="utf-8") as file:
