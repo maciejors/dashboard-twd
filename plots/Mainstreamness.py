@@ -19,7 +19,7 @@ def popularity(df):
     for song in songs.iterrows():
         artists.append(song[1].artistName)
     artists = list(set(artists))
-    artists = sample(artists, round(len(artists)/10))
+    artists = sample(artists, 100)
     pop = []
     for artistName in artists:
         artist = sp.search(q=artistName, type="artist")
@@ -47,6 +47,3 @@ def popularity(df):
         plot_bgcolor='rgba(43, 43, 43, 1)'
     )
     return fig
-if __name__ == "__main__":
-    fig = popularity(get_streaming_history(ZipFile("C:\school\TWD\github\project2\my_spotify_data.zip")))
-    fig.show()
