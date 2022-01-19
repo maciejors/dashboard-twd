@@ -8,6 +8,7 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
+from plots.Mainstreamness import popularity
 from plots.favourite_artist import favourite_artist
 from plots.song_most_skipped import most_skipped
 from plots.when_listening_dist import when_listening_dist
@@ -22,11 +23,34 @@ app = dash.Dash(
 )
 server = app.server
 
+
+def wrap_with_custom_loading(children, style=None):
+    if style is None:
+        style = dict()
+    return html.Div(
+        children=[
+            html.Br(),
+            dcc.Loading(
+                children=children,
+                type="circle",
+                color="#FFC66D",
+            ),
+            html.Br(),
+        ],
+        style=style
+    )
+
+
 app.layout = html.Div([
-    html.H2("Upload your Spotify data, then choose date range to analyse or leave the default date.",
-            style={
-                'textAlign': 'center'
-            }),
+    # title:
+    html.H2(
+        "Upload your Spotify data, then choose date range to analyse or leave the default date.",
+        style={
+            'textAlign': 'center'
+        }),
+    # data storage:
+    html.Div(id="all-data"),
+    # upload button:
     dcc.Upload(
         id="upload-data",
         children=html.Button("Upload zipped Spotify data"),
@@ -36,37 +60,56 @@ app.layout = html.Div([
             'textAlign': 'center'
         }
     ),
-    html.Div(id="all-data",
-             style={
-                 'textAlign': 'center'
-             }),
+    # date picker:
+    html.Br(),
     html.Div(id="date-picker-div",
              style={
                  'textAlign': 'center'
              }),
-    html.Div(id="favourite-artist",
-             style={
-                 'textAlign': 'center'
-             }),
-    html.Hr(),
-    html.Div(id="most-skipped",
-             style={
-                 'textAlign': 'center'
-             }),
-    html.Hr(),
-    html.Div(id="when-listening",
-             style={
-                 'textAlign': 'center'
-             }),
-    html.Hr(),
+    # favourite artist:
+    html.Div(id="separator1"),
+    wrap_with_custom_loading(
+        html.Div(id="favourite-artist",
+                 style={
+                     'textAlign': 'center'
+                 }),
+    ),
+    # most skipped song:
+    html.Div(id="separator2"),
+    wrap_with_custom_loading(
+        html.Div(id="most-skipped",
+                 style={
+                     'textAlign': 'center'
+                 }),
+    ),
+    # when do you listen:
+    html.Div(id="separator3"),
+    wrap_with_custom_loading(
+        html.Div(id="when-listening",
+                 style={
+                     'textAlign': 'center'
+                 })
+    ),
+    # popularity distribution:
+    html.Div(id="separator4"),
+    wrap_with_custom_loading(
+        html.Div(id="popularity-dist",
+                 style={
+                     'textAlign': 'center'
+                 })
+    ),
+    # wordcloud:
+    html.Div(id="separator5"),
     html.Div(id="slider-div",
              style={
-                 'textAlign': 'center'
+                 'textAlign': 'center',
              }),
-    html.Div(id="wordcloud",
-             style={
-                 'textAlign': 'center'
-             }),
+    wrap_with_custom_loading(
+        html.Div(id="wordcloud",
+                 style={
+                     'textAlign': 'center'
+                 })
+    ),
 ])
 
 
@@ -89,6 +132,17 @@ def update_streaming_history(file_contents):
 
 
 @app.callback(
+    Output("separator1", "children"),
+    Output("separator2", "children"),
+    Output("separator3", "children"),
+    Output("separator4", "children"),
+    Output("separator5", "children"),
+    Input("streaming-history-storage", "data"))
+def place_separators(streaming_history):
+    return [html.Hr()] * 5
+
+
+@app.callback(
     Output("date-picker-div", "children"),
     Input("streaming-history-storage", "data"))
 @all_args_none(default_val=None)
@@ -105,6 +159,7 @@ def update_date_picker(streaming_history):
             initial_visible_month=max_date,
             start_date=min_date,
             end_date=max_date,
+            display_format="D MMM YYYY",
         ),
     ]
 
@@ -119,12 +174,18 @@ def update_slider(streaming_history):
                 style={
                     'textAlign': 'center'
                 }),
-        dcc.Slider(
-            id="last-x-songs-slider",
-            min=5,
-            max=20,
-            marks={i: '{}'.format(i) for i in range(3, 21)},
-            value=10,
+        html.Div(
+            dcc.Slider(
+                id="last-x-songs-slider",
+                min=5,
+                max=20,
+                marks={i: '{}'.format(i) for i in range(3, 21)},
+                value=10,
+            ),
+            style={
+                'padding-left': '30%',
+                'padding-right': '30%',
+            },
         ),
     ]
 
@@ -164,8 +225,11 @@ def on_slider_changed(new_value, streaming_history):
 def update_favourite_artist(streaming_history):
     streaming_history = pd.DataFrame(streaming_history)
     artist_name, img_url = favourite_artist(streaming_history)
+    import time
+    time.sleep(2.0)
     return [
-        html.H3(f"Most listened to artist: {artist_name}"),
+        html.H3("The artist you\'ve listened to the most:"),
+        html.H3(artist_name),
         html.Img(
             alt=f"Image of {artist_name}",
             src=img_url
@@ -185,12 +249,13 @@ def update_most_skipped(streaming_history):
     cover_img_url, number_of_skips, track_name, artist_name = \
         most_skipped(streaming_history)
     return [
-        html.H3(f'The song you\'ve skipped the most during its first two seconds.'
-                f'\nYou\'ve skipped it {number_of_skips} times.'),
+        html.H3('The song you\'ve skipped the most'),
+        html.H3('during its first two seconds.'),
+        html.H3(f'You\'ve skipped it {number_of_skips} times.'),
         html.Img(
             src=cover_img_url,
             alt="most skipped track"
-        ),
+        ) if cover_img_url != "" else html.Br(),
         html.H4(f'\"{track_name}\" by {artist_name}')
     ]
 
@@ -210,6 +275,24 @@ def update_when_listening(streaming_history):
             id="when-listening-plot",
             figure=when_listening_dist(df),
         ),
+    ]
+
+
+# ========== POPULARITY DISTRIBUTION ==========#
+
+
+@app.callback(
+    Output("popularity-dist", "children"),
+    Input("streaming-history-dates-filtered", "data"))
+@all_args_none(default_val=None)
+def update_popularity_distribution(streaming_history):
+    df = pd.DataFrame(streaming_history)
+    return [
+        html.H3("How mainstream are you?"),
+        dcc.Graph(
+            id="popularity-distribution-plot",
+            figure=popularity(df)
+        )
     ]
 
 

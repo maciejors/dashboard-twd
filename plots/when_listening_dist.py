@@ -27,20 +27,26 @@ def when_listening_dist(df: pd.DataFrame):
             df = df.append({"hour": i, "count": 0}, ignore_index=True)
     df = df.sort_values("hour", ignore_index=True)
     # format the interval
+    # df = df.assign(hourInterval=lambda x: x["hour"].astype(str) + " - " +
+    #                                       ((x["hour"] + 1) % 24).astype(str))[
+    #     ["hourInterval", "count"]]
     df["hour"] = df["hour"].astype(str)
-    df = df.assign(hourInterval=lambda x: x["hour"] + ":00 - " + x["hour"] + ":59")[
-        ["hourInterval", "count"]]
     fig = px.bar(
         data_frame=df,
-        x="hourInterval",
+        x="hour",
         y="count",
         labels={
-            "hourInterval": "Hour interval",
+            "hour": "Hour interval",
             "count": "Number of tracks listened to",
         },
-        color_discrete_sequence=['#CB772F'] * len(df)
+        color_discrete_sequence=['#CB772F'] * len(df),
+        title="Number of songs you\'ve listened to in given time intervals"
     )
     fig.update_layout(paper_bgcolor='rgba(43, 43, 43, 1)',
                       plot_bgcolor='rgba(43, 43, 43, 1)',
-                      font=dict([('color', 'rgba(255, 198, 109, 1)')]))
+                      font=dict(
+                          family="Courier New, monospace",
+                          size=14,
+                          color="#CB772F")
+                      )
     return fig

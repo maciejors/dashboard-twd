@@ -46,16 +46,4 @@ def create_wordcloud(words_to_cloud):
 
     with open("./assets/sw.txt", "r", encoding="utf-8") as file:
         sw = eval(file.read())
-        return WordCloud(stopwords=sw, background_color="#2B2B2B", width=800, height=400).generate(words_to_cloud)
-
-# Tak to testowałem, wrzucam żeby na potem było wiadomo co tam dodatkowo trzeba dopisać przy
-# printowaniu żeby ładnie wyglądało
-# word_cloud = create_wordcloud(
-#         get_lyrics(
-#             get_streaming_history(
-#                 ZipFile("./my_spotify_data.zip"))
-#         )
-#     )
-#     plt.imshow(word_cloud, interpolation='bilinear')
-#     plt.axis("off")
-#     plt.show()
+        return WordCloud(stopwords=sw, background_color="#2B2B2B", colormap='Oranges', width=800, height=400).generate(words_to_cloud)

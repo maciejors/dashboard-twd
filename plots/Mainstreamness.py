@@ -1,5 +1,3 @@
-import random
-
 import let
 import pandas as pd
 import plotly.express as px
@@ -20,36 +18,30 @@ def popularity(df):
     for song in songs.iterrows():
         artists.append(song[1].artistName)
     artists = list(set(artists))
-    artists = random.sample(artists, round(len(artists)/10))
-    popularity = []
+    pop = []
     for artistName in artists:
         artist = sp.search(q=artistName, type="artist")
-        if artist["artists"]["items"] == []:
-            popularity.append(None)
+        if not artist["artists"]["items"]:
+            pop.append(None)
             continue
-        popularity.append(artist["artists"]["items"][0]["popularity"])
-        if artist["artists"]["items"][0]["popularity"] == 1:
-            print(artist["artists"]["items"][0])
+        pop.append(artist["artists"]["items"][0]["popularity"])
     data = {'artist': artists,
-            'popularity': popularity}
+            'popularity': pop}
     df = pd.DataFrame(data, columns=['artist', 'popularity'])
     df = df.groupby("popularity").count().reset_index()
     fig = px.histogram(df, x="popularity", y="artist", nbins=100,
-                       title="popularity distribution <br><sub>How mainstream are you?</sup>",
-                       labels={"artist": "number of artists"})
+                       title="Popularity distribution <br><sub>How popular are the artists you listen to?</sup>",
+                       labels={"artist": "number of artists"},
+                       color_discrete_sequence=['#CB772F'] * len(df))
     fig.update_layout(
-        xaxis_title="number of artists",
-        yaxis_title="popularity",
+        xaxis_title="Number of artists",
+        yaxis_title="Popularity",
         font=dict(
             family="Courier New, monospace",
             size=18,
-            color="RebeccaPurple"
-        )
+            color="#CB772F"
+        ),
+        paper_bgcolor='rgba(43, 43, 43, 1)',
+        plot_bgcolor='rgba(43, 43, 43, 1)'
     )
-    fig.update_layout({
-        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-    })
     return fig
-
-
