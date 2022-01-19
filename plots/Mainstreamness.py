@@ -5,6 +5,7 @@ from zipfile import ZipFile
 import utils
 from Spotipy import get_sp
 from utils.readingfiles import get_streaming_history
+from random import sample
 
 def popularity(df):
     '''
@@ -18,6 +19,7 @@ def popularity(df):
     for song in songs.iterrows():
         artists.append(song[1].artistName)
     artists = list(set(artists))
+    artists = sample(artists, round(len(artists)/10))
     pop = []
     for artistName in artists:
         artist = sp.search(q=artistName, type="artist")
@@ -45,3 +47,6 @@ def popularity(df):
         plot_bgcolor='rgba(43, 43, 43, 1)'
     )
     return fig
+if __name__ == "__main__":
+    fig = popularity(get_streaming_history(ZipFile("C:\school\TWD\github\project2\my_spotify_data.zip")))
+    fig.show()
